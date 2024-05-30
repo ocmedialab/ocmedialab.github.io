@@ -1,67 +1,103 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import {
+  // BoxGeometry,
+  // MeshBasicMaterial,
+  // Mesh,
+  GridHelper,
+  AxesHelper,
+  WebGLRenderer,
+  Scene,
+  PerspectiveCamera,
+  Clock,
+} from "three";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { Model } from "./Model.js";
+import gsap from "gsap";
 
-/*------------------------------
-Renderer
-------------------------------*/
-const renderer = new THREE.WebGLRenderer({
-  antialias: true,
-  alpha: true,
-});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-/*------------------------------
-Scene & Camera
-------------------------------*/
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  50,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  100
-);
-camera.position.z = 5;
-camera.position.y = 1;
-
-/*------------------------------
-Mesh
-------------------------------*/
-const geometry = new THREE.BoxGeometry(2, 2, 2);
-const material = new THREE.MeshBasicMaterial({
-  color: 0x00ff00,
-});
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-
-/*------------------------------
-OrbitControls
-------------------------------*/
-const controls = new OrbitControls(camera, renderer.domElement);
-
-/*------------------------------
-Helpers
-------------------------------*/
-const gridHelper = new THREE.GridHelper(10, 10);
-scene.add(gridHelper);
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
-
-/*------------------------------
-Loop
-------------------------------*/
-const animate = function () {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
+const helpers = (s) => {
+  const gridHelper = new GridHelper(10, 10);
+  s.add(gridHelper);
+  const axesHelper = new AxesHelper(5);
+  s.add(axesHelper);
 };
-animate();
 
-/*------------------------------
-Resize
-------------------------------*/
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+const init = (w) => {
+  const d = w.document;
+  // Renderer
+  const renderer = new WebGLRenderer({
+    antialias: true,
+    alpha: true,
+  });
+  renderer.setSize(w.innerWidth, w.innerHeight);
+  d.body.appendChild(renderer.domElement);
+
+  // Scene & Camera
+  const scene = new Scene();
+  const camera = new PerspectiveCamera(
+    50,
+    w.innerWidth / w.innerHeight,
+    0.1,
+    100
+  );
+  camera.position.z = 5;
+  camera.position.y = 1;
+
+  // OrbitControls
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enabled = false;
+
+  // Helpers
+  // helpers(scene);
+
+  // Models
+  const s = new Model({
+    name: "skull",
+    file: "/models/skull.glb",
+    scene: scene,
+    uColor1: "#CC64FF", // 204, 100, 225;
+    uColor2: "#8B61D3", // 139, 97, 211;
+    uColor3: "#53CDDF", // 83, 205, 223;
+  });
+
+  // Controllers
+  const btn = d.getElementById("toggle");
+  btn.addEventListener("click", (event) => {
+    const t = event.target;
+    const h = t.dataset.hidden;
+    t.setAttribute("data-hidden", !h ? "hidden" : "");
+    !h ? s.remove() : s.add();
+  });
+
+  // Loop
+  const clock = new Clock();
+  const animate = function () {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+    if (s.isActive) {
+      s.particlesMaterial.uniforms.uTime.value = clock.getElapsedTime();
+    }
+  };
+  animate();
+
+  // Resize
+  function onWindowResize() {
+    camera.aspect = w.innerWidth / w.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w.innerWidth, w.innerHeight);
+  }
+  w.addEventListener("resize", onWindowResize, false);
+
+  const onMouseMove = (event) => {
+    const x = event.clientX;
+    const y = event.clientY;
+
+    gsap.to(scene.rotation, {
+      y: gsap.utils.mapRange(0, w.innerWidth, 0.2, -0.2, x),
+      x: gsap.utils.mapRange(0, w.innerHeight, 0.2, -0.2, y),
+    });
+  };
+  w.addEventListener("mousemove", onMouseMove);
+};
+
+if (typeof window !== "undefined") {
+  init(window);
 }
-window.addEventListener("resize", onWindowResize, false);
