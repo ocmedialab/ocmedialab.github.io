@@ -1,3 +1,4 @@
+// import { resolveLygia } from "lygia";
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -14,9 +15,18 @@ import {
   MeshSurfaceSampler,
 } from "three/examples/jsm/Addons.js";
 import { gsap } from "gsap";
-import vertexShader from "./shader/vertexShader.glsl";
-import fragmentShader from "./shader/fragmentShader.glsl";
+// import vertexShader from "./shader/vertexShader.glsl";
+// import fragmentShader from "./shader/fragmentShader.glsl";
+
+// import v from "./shader/vertexShader.glsl";
+// import f from "./shader/fragmentShader.glsl";
+
 const rangeNegOneToOne = (rangeEnd = 2) => Math.random() * rangeEnd - 1;
+
+// const V = resolveLygia(v);
+// const F = resolveLygia(f);
+// const vertexShader = createShader(V);
+// const fragmentShader = createShader(F);
 
 class Model {
   constructor({ name, file, scene, uColor1, uColor2, uColor3, isActive }) {
@@ -27,6 +37,8 @@ class Model {
     this.uColor2 = uColor2;
     this.uColor3 = uColor3;
     this.isActive = isActive;
+
+    this.DIR = 8;
 
     // Draco is an open-source library for compressing and decompressing 3D geometric meshes and point clouds. It is intended to improve the storage and transmission of 3D graphics.
     this.dracoLoader = new DRACOLoader();
@@ -65,6 +77,7 @@ class Model {
             },
             uTime: { value: 0 },
             uScale: { value: 0 },
+            uHide: { value: false },
           },
           vertexShader, // takes care of managing positoin of verticies
           fragmentShader, // used to color each pixel of the mesh
@@ -116,22 +129,23 @@ class Model {
 
     gsap.to(this.particlesMaterial.uniforms.uScale, {
       value: 1,
-      duration: 0.8,
+      duration: this.DIR,
       delay: 0.3,
       ease: "power3.out",
       // onStart: () => {},
     });
 
     gsap.to("canvas", {
-      background: "purple",
-      duration: 0.8,
+      background:
+        "linear-gradient(90deg, rgba(10,10,10,1) 0%, rgba(12,12,12,1) 56%, rgba(6,6,6,1) 100%)",
+      duration: this.DIR,
     });
   }
 
   remove() {
     gsap.to(this.particlesMaterial.uniforms.uScale, {
       value: 0,
-      duration: 0.8,
+      duration: this.DIR,
       ease: "power3.out",
       onComplete: () => {
         this.scene.remove(this.particles);
@@ -141,7 +155,7 @@ class Model {
 
     gsap.to("canvas", {
       background: "black",
-      duration: 0.8,
+      duration: this.DIR,
     });
   }
 }
