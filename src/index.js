@@ -1,21 +1,15 @@
 import gsap from "gsap";
 import {
-  // BoxGeometry,
-  // MeshBasicMaterial,
-  // Mesh,
-  // GridHelper,
-  // AxesHelper,
   WebGLRenderer,
   Scene,
   PerspectiveCamera,
   Clock,
-  Raycaster,
-  // Vector3,
-  // Mesh,
+  // Raycaster,
   Vector2,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { Model } from "./Model.js";
+// import Stats from "three/examples/jsm/libs/stats.module.js";
 
 // const helpers = (s) => {
 //   const gridHelper = new GridHelper(10, 10);
@@ -35,7 +29,8 @@ const getWindowProps = (w) => {
 
 const init = (w) => {
   const d = w.document;
-  const raycaster = new Raycaster();
+  // const stats = new Stats();
+  // const raycaster = new Raycaster();
   const pointer = new Vector2();
   const clock = new Clock();
   const { W, H } = getWindowProps(w);
@@ -44,7 +39,7 @@ const init = (w) => {
   const scene = new Scene({ background: "red" });
 
   // camera's en.wikipedia.org/wiki/Viewing_frustum
-  const camera = new PerspectiveCamera( //
+  const camera = new PerspectiveCamera(
     50, // fov — Camera frustum vertical field of view. Default 50.
     W / H, // aspect — Camera frustum aspect ratio. Default 1.
     0.1, // near — Camera frustum near plane. Default 0.1.
@@ -57,9 +52,9 @@ const init = (w) => {
     alpha: true,
   });
   renderer.setPixelRatio(w.devicePixelRatio);
-  const C = renderer.domElement;
   renderer.setSize(W, H);
   renderer.setAnimationLoop(animate);
+  const C = renderer.domElement;
   d.body.appendChild(C);
 
   // start
@@ -67,13 +62,11 @@ const init = (w) => {
   // camera.position.z = 5;
 
   // fin
-  camera.position.x = 0;
-  camera.position.y = 35;
-  camera.position.z = 0;
+  camera.position.set(0, 35, 0);
 
   // OrbitControls
   const controls = new OrbitControls(camera, C);
-  // controls.enabled = false;
+  controls.enabled = false;
 
   // Helpers
   // helpers(scene);
@@ -88,8 +81,7 @@ const init = (w) => {
     uColor3: "#53CDDF", // 83, 205, 223;
   });
 
-  // Resize
-  function onWindowResize() {
+  function resize() {
     const { W, H } = getWindowProps(w);
     camera.aspect = W / H;
     camera.updateProjectionMatrix();
@@ -97,64 +89,43 @@ const init = (w) => {
   }
 
   function click() {
-    raycaster.setFromCamera(pointer, camera);
-
+    console.log("pointermove() -----------");
+    // raycaster.setFromCamera(pointer, camera);
     // .computeBoundingBox()
-    // s.particles;
-
-    // console.log(s.particlesGeometry);
-    // const intersects = raycaster.intersectObjects(scene.children[0]);
-    // console.log(intersects);
-
+    // const intersects = raycaster.intersectObjects();
     // for (let i = 0; i < intersects.length; i++) {
     //   if (intersects[i]) {
     //     console.log("HIT ------");
-
     //     break;
     //   }
     // }
   }
 
-  // s.particlesMaterial.uniforms.uHide.value = true;
-
-  // camera.position.z = 100;
-  // camera.aspect = W / H;
-  // camera.updateProjectionMatrix();
-
-  const onMouseMove = (event) => {
-    console.log("onMouseMove() -----------");
-    const x = event.clientX;
-    const y = event.clientY;
+  function pointermove(event) {
+    console.log("pointermove() -----------");
+    // document.body.style.cursor = "pointer";
+    const X = event.clientX;
+    const Y = event.clientY;
     const { W, H } = getWindowProps(w);
-    pointer.x = (x / W) * 2 - 1;
-    pointer.y = -(y / H) * 2 + 1;
-    // gsap.to(scene.rotation, {
-    //   x: gsap.utils.mapRange(0, w.innerHeight, 0.2, -0.2, y),
-    //   y: gsap.utils.mapRange(0, w.innerWidth, 0.2, -0.2, x),
-    // });
-  };
+    pointer.x = (X / W) * 2 - 1;
+    pointer.y = -(Y / H) * 2 + 1;
+    gsap.to(scene.rotation, {
+      x: gsap.utils.mapRange(0, w.innerHeight, 0.2, -0.2, pointer.x),
+      y: gsap.utils.mapRange(0, w.innerWidth, 0.2, -0.2, pointer.y),
+    });
+  }
 
-  // function onPointerMove(event) {
-  //   console.log("onPointerMove() -----------");
-  //   // calculate pointer position in normalized device coordinates
-  //   // (-1 to +1) for both components
-  //   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-  //   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  // }
-
-  // ANIMATION LOOP
   function animate() {
     renderer.render(scene, camera);
-    if (s.isActive) {
+    // stats.update();
+    if (s.particlesMaterial) {
       s.particlesMaterial.uniforms.uTime.value = clock.getElapsedTime();
     }
   }
 
-  w.addEventListener("resize", onWindowResize, false);
-  w.addEventListener("click", click, false);
-  w.addEventListener("mousemove", onMouseMove);
-  // w.addEventListener("pointermove", onPointerMove);
-  // document.addEventListener("mousedown", mousedown, false);
+  w.addEventListener("resize", resize, false);
+  C.addEventListener("click", click, false);
+  C.addEventListener("pointermove", pointermove, false);
 };
 
 if (typeof window !== "undefined") {

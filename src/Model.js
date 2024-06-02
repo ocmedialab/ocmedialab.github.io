@@ -15,14 +15,13 @@ import {
   MeshSurfaceSampler,
 } from "three/examples/jsm/Addons.js";
 import { gsap } from "gsap";
-// import vertexShader from "./shader/vertexShader.glsl";
-// import fragmentShader from "./shader/fragmentShader.glsl";
+import vertexShader from "./shader/vertexShader.glsl";
+import fragmentShader from "./shader/fragmentShader.glsl";
 
 // import v from "./shader/vertexShader.glsl";
 // import f from "./shader/fragmentShader.glsl";
 
 const rangeNegOneToOne = (rangeEnd = 2) => Math.random() * rangeEnd - 1;
-
 // const V = resolveLygia(v);
 // const F = resolveLygia(f);
 // const vertexShader = createShader(V);
@@ -37,8 +36,7 @@ class Model {
     this.uColor2 = uColor2;
     this.uColor3 = uColor3;
     this.isActive = isActive;
-
-    this.DIR = 8;
+    this.DIR = 12.0;
 
     // Draco is an open-source library for compressing and decompressing 3D geometric meshes and point clouds. It is intended to improve the storage and transmission of 3D graphics.
     this.dracoLoader = new DRACOLoader();
@@ -87,7 +85,7 @@ class Model {
           blending: AdditiveBlending,
         });
 
-        const particleCount = 40000;
+        const particleCount = 20000;
         const particleM = 3;
         const mss = new MeshSurfaceSampler(this.mesh).build();
         this.particlesGeometry = new BufferGeometry();
@@ -98,7 +96,11 @@ class Model {
           mss.sample(newPos);
           particlesPos.set([newPos.x, newPos.y, newPos.z], i * particleM);
           particlesRand.set(
-            [rangeNegOneToOne(), rangeNegOneToOne(), rangeNegOneToOne()],
+            [
+              rangeNegOneToOne(particleM * 0.5),
+              rangeNegOneToOne(particleM * 0.5),
+              rangeNegOneToOne(particleM * 0.5),
+            ],
             i * particleM
           );
         }
@@ -125,38 +127,43 @@ class Model {
 
   add() {
     this.scene.add(this.particles);
-    this.isActive = true;
-
     gsap.to(this.particlesMaterial.uniforms.uScale, {
       value: 1,
       duration: this.DIR,
       delay: 0.3,
       ease: "power3.out",
-      // onStart: () => {},
-    });
-
-    gsap.to("canvas", {
-      background:
-        "linear-gradient(90deg, rgba(10,10,10,1) 0%, rgba(12,12,12,1) 56%, rgba(6,6,6,1) 100%)",
-      duration: this.DIR,
-    });
-  }
-
-  remove() {
-    gsap.to(this.particlesMaterial.uniforms.uScale, {
-      value: 0,
-      duration: this.DIR,
-      ease: "power3.out",
-      onComplete: () => {
-        this.scene.remove(this.particles);
-        this.isActive = false;
+      onStart: function () {
+        console.log("START");
+        gsap.to("canvas", {
+          background:
+            "linear-gradient(90deg, rgba(10,10,10,1) 0%, rgba(12,12,12,1) 56%, rgba(6,6,6,1) 100%)",
+          duration: this.DIR,
+        });
       },
     });
-
-    gsap.to("canvas", {
-      background: "black",
-      duration: this.DIR,
+    gsap.to("#info", {
+      opacity: 0.8,
+      delay: this.DIR * 0.5,
+      ease: "power3.out",
+      duration: this.DIR * 0.5,
     });
   }
+
+  // remove() {
+  //   gsap.to(this.particlesMaterial.uniforms.uScale, {
+  //     value: 0,
+  //     duration: this.DIR,
+  //     ease: "power3.out",
+  //     onComplete: () => {
+  //       this.scene.remove(this.particles);
+  //       this.opendAnimationEnded = true;
+  //     },
+  //   });
+
+  //   gsap.to("canvas", {
+  //     background: "black",
+  //     duration: this.DIR,
+  //   });
+  // }
 }
 export { Model };

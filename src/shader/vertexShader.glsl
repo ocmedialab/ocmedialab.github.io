@@ -8,14 +8,13 @@ uniform bool uHide;
 void main() {
   
   vPosition = position; // this.particlesGeometry.attributes.position 
-  float particleSize = 1.0;
-  float circularuRadiusModifier = 0.05;
+  float particleSize = 3.0;
+  // float circularuRadiusModifier = 0.05;
   float b = 4.0;
   float time = uTime * b;
   vec3 pos = position;
   float ZERO = 0.0;
   float ONE = 1.0;
-  
  
   // pos.x += sin(time * aRandom.x) * circularuRadiusModifier;
   // pos.y += cos(time * aRandom.y) * circularuRadiusModifier;
