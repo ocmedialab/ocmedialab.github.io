@@ -1,12 +1,5 @@
 import gsap from "gsap";
-import {
-  WebGLRenderer,
-  Scene,
-  PerspectiveCamera,
-  Clock,
-  // Raycaster,
-  Vector2,
-} from "three";
+import { WebGLRenderer, Scene, PerspectiveCamera, Clock, Vector2 } from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { Model } from "./Model.js";
 // import Stats from "three/examples/jsm/libs/stats.module.js";
@@ -36,7 +29,7 @@ const init = (w) => {
   const { W, H } = getWindowProps(w);
 
   // Scene & Camera
-  const scene = new Scene({ background: "red" });
+  const scene = new Scene();
 
   // camera's en.wikipedia.org/wiki/Viewing_frustum
   const camera = new PerspectiveCamera(
@@ -66,7 +59,7 @@ const init = (w) => {
 
   // OrbitControls
   const controls = new OrbitControls(camera, C);
-  controls.enabled = false;
+  // controls.enabled = false;
 
   // Helpers
   // helpers(scene);
@@ -89,7 +82,8 @@ const init = (w) => {
   }
 
   function click() {
-    console.log("pointermove() -----------");
+    console.log("click() -----------");
+    // console.log("pointer", pointer);
     // raycaster.setFromCamera(pointer, camera);
     // .computeBoundingBox()
     // const intersects = raycaster.intersectObjects();
@@ -106,12 +100,12 @@ const init = (w) => {
     // document.body.style.cursor = "pointer";
     const X = event.clientX;
     const Y = event.clientY;
-    const { W, H } = getWindowProps(w);
-    pointer.x = (X / W) * 2 - 1;
-    pointer.y = -(Y / H) * 2 + 1;
+    // const { W, H } = getWindowProps(w);
+    // pointer.x = (X / W) * 2 - 1;
+    // pointer.y = -(Y / H) * 2 + 1;
     gsap.to(scene.rotation, {
-      x: gsap.utils.mapRange(0, w.innerHeight, 0.2, -0.2, pointer.x),
-      y: gsap.utils.mapRange(0, w.innerWidth, 0.2, -0.2, pointer.y),
+      x: gsap.utils.mapRange(0, w.innerHeight, 0.6, -0.6, Y),
+      y: gsap.utils.mapRange(0, w.innerWidth, 0.6, -0.6, X),
     });
   }
 
