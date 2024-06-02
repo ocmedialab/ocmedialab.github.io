@@ -1,4 +1,3 @@
-// import { resolveLygia } from "lygia";
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -18,14 +17,7 @@ import { gsap } from "gsap";
 import vertexShader from "./shader/vertexShader.glsl";
 import fragmentShader from "./shader/fragmentShader.glsl";
 
-// import v from "./shader/vertexShader.glsl";
-// import f from "./shader/fragmentShader.glsl";
-
 const rangeNegOneToOne = (rangeEnd = 2) => Math.random() * rangeEnd - 1;
-// const V = resolveLygia(v);
-// const F = resolveLygia(f);
-// const vertexShader = createShader(V);
-// const fragmentShader = createShader(F);
 
 class Model {
   constructor({ name, file, scene, uColor1, uColor2, uColor3, isActive }) {
